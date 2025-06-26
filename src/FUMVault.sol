@@ -12,7 +12,6 @@ import "@chainlink/contracts/v0.8/interfaces/AutomationCompatibleInterface.sol";
 
 /// @title FUMVault - Fund Ur Memory/Money Commitment Vault
 /// @notice A DeFi protocol for automated asset management using commitment contracts
-/// @dev MVP version with Chainlink Price Feeds and Automation integration
 contract FUMVault is ReentrancyGuard, Pausable, Ownable, AutomationCompatibleInterface {
     using SafeERC20 for IERC20;
     using Address for address payable;
@@ -439,7 +438,7 @@ contract FUMVault is ReentrancyGuard, Pausable, Ownable, AutomationCompatibleInt
     //                    CHAINLINK INTEGRATION
     // =============================================================
 
-    /// @notice Get current price from Chainlink price feed with enhanced validation
+    /// @notice Get current price from Chainlink price feed
     /// @param _token Token address to get price for
     /// @return price Current price in USD (normalized to 8 decimals)
     function getCurrentPrice(address _token) public view returns (uint256 price) {

@@ -1,36 +1,33 @@
-# 🚀 F.U.M Vault - Fund Ur Memory
+# F.U.M Vault - Fund Ur Memory
 
-> **"Set It, Forget It, Let AI Remember It – Your Cross-Chain Autonomous Wealth Vault"**
+> **DeFi commitment contracts for automated asset management with time and price conditions**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Foundry](https://img.shields.io/badge/Built%20with-Foundry-FFDB1C.svg)](https://getfoundry.sh/)
 [![Chainlink](https://img.shields.io/badge/Powered%20by-Chainlink-375BD2.svg)](https://chain.link/)
 
-F.U.M Vault is a revolutionary DeFi protocol that implements **"Commitment Contracts"** - smart contracts that enforce your future self's rational decisions by removing present-day emotions from trading decisions.
+F.U.M Vault is a DeFi protocol that allows users to lock assets with customizable time and price conditions. The protocol uses Chainlink price feeds and automation to automatically unlock vaults when conditions are met, helping users implement disciplined investment strategies.
 
-## 🌟 Key Features
+## Key Features
 
-- ⏰ **Time-based Commitments**: Lock assets until a specific time
-- 💰 **Price-based Commitments**: Unlock when target prices are reached
-- 🔄 **Combined Conditions**: Mix time and price conditions with AND/OR logic
-- 📊 **Price Range Vaults**: Unlock when price is within a specific range
-- 🤖 **Chainlink Automation**: Fully automated condition monitoring
-- 🌐 **Cross-chain Support**: CCIP integration for multi-chain operations
-- 🛡️ **Emergency Withdrawals**: Safety mechanism with penalty system
-- 📈 **Real-time Price Feeds**: Chainlink price feeds with validation
-- 🔒 **Security First**: Comprehensive security measures and testing
+- **Time-based Vaults**: Lock assets until a specific timestamp
+- **Price-based Vaults**: Unlock when token price reaches target
+- **Combined Conditions**: Time OR Price, or Time AND Price logic
+- **Chainlink Integration**: Real-time price feeds and automation
+- **Emergency Withdrawals**: Immediate access with 10% penalty
+- **Multi-token Support**: ETH and ERC20 tokens
+- **Automated Unlocking**: Chainlink Automation monitors conditions 24/7
+- **Security**: ReentrancyGuard, access controls, comprehensive testing
 
-## 🏗️ Architecture
+## Architecture
 
-```
-FUMVault (Main Contract)
-├── FUMVaultCore (Base functionality)
-├── ChainlinkPriceFeedModule (Price data)
-├── ChainlinkAutomationModule (Automated execution)
-└── ChainlinkCCIPModule (Cross-chain operations)
-```
+The F.U.M protocol consists of a single main contract with modular functionality:
 
-## 🚀 Quick Start
+- **FUMVault.sol**: Main contract handling vault creation, management, and withdrawals
+- **Chainlink Integration**: Price feeds and automation for condition monitoring
+- **Emergency System**: Penalty-based emergency withdrawal mechanism
+
+## Quick Start
 
 ### Prerequisites
 
@@ -42,15 +39,16 @@ FUMVault (Main Contract)
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/fund-ur-memory.git
-cd fund-ur-memory/fund-ur-memory-contract
+git clone <repository-url>
+cd fund-ur-memory-contract
 
 # Install dependencies
 forge install
 
-# Copy environment file
-cp .env.example .env
-# Edit .env with your configuration
+# Set up environment variables
+export PRIVATE_KEY="your_private_key_here"
+export FUJI_RPC_URL="https://api.avax-test.network/ext/bc/C/rpc"
+export FUM_VAULT_ADDRESS="0x5274A2153cF842E3bD1D4996E01d567750d0e739"
 ```
 
 ### Build and Test
@@ -72,138 +70,116 @@ forge test --gas-report
 forge coverage
 ```
 
-**✅ Test Results - All 27 Tests Passing!**
-```
-Ran 27 tests for test/FUMVault.t.sol:FUMVaultTest
-[PASS] testCheckUpkeepNoVaults() (gas: 13490)
-[PASS] testCheckUpkeepWithReadyVaults() (gas: 325032)
-[PASS] testCreatePriceVault() (gas: 206180)
-[PASS] testCreateTimeVault() (gas: 186230)
-[PASS] testCreateTokenVault() (gas: 231798)
-[PASS] testEmergencyWithdrawal() (gas: 314359)
-[PASS] testFullWorkflowPriceVault() (gas: 294616)
-[PASS] testFullWorkflowTimeVault() (gas: 199683)
-[PASS] testPerformUpkeep() (gas: 211525)
-[PASS] testPriceConditionMet() (gas: 306242)
-[PASS] testTimeConditionMet() (gas: 180212)
-[PASS] testWithdrawVault() (gas: 201800)
-... and 15 more tests covering edge cases and error conditions
-Suite result: ok. 27 passed; 0 failed; 0 skipped
-```
-
 **Test Coverage:**
-- ✅ Basic functionality (deployment, configuration)
-- ✅ Vault creation (all condition types)
-- ✅ Condition checking (time, price, combined)
-- ✅ Vault operations (withdraw, emergency)
-- ✅ Chainlink automation (checkUpkeep, performUpkeep)
-- ✅ Price feed validation (staleness, decimals)
-- ✅ Error conditions (invalid inputs, permissions)
-- ✅ Integration workflows (end-to-end)
+- Vault creation (time, price, combined conditions)
+- Condition checking and automated unlocking
+- Withdrawal operations and emergency system
+- Chainlink automation integration
+- Price feed validation and error handling
+- Access control and security measures
 
 ### Deploy
 
 ```bash
-# Deploy to Sepolia testnet
-forge script script/DeployFUMVault.s.sol --rpc-url $SEPOLIA_RPC_URL --broadcast --verify
+# Deploy to Avalanche Fuji testnet
+forge script script/DeployFUM.s.sol --rpc-url $FUJI_RPC_URL --broadcast
 
-# Deploy to mainnet
-forge script script/DeployFUMVault.s.sol --rpc-url $ETH_RPC_URL --broadcast --verify
+# Setup contract configuration
+forge script script/SetupFUM.s.sol --rpc-url $FUJI_RPC_URL --broadcast
+
+# Test deployment
+forge script script/QuickTest.s.sol --rpc-url $FUJI_RPC_URL
 ```
 
-## 💡 Usage Examples
+## Usage Examples
 
 ### Create a Time-based Vault
 
+```bash
+# Create vault that unlocks in 1 hour
+forge script script/ManageVaults.s.sol:CreateVaults --rpc-url $FUJI_RPC_URL --broadcast
+```
+
 ```solidity
-// Lock 1 ETH for 30 days
-uint256 vaultId = fumVault.createTimeVaultWithAutomation{value: 1 ether}(
+// Lock 0.1 ETH for 1 hour
+uint256 vaultId = fumVault.createTimeVault{value: 0.1 ether}(
     address(0), // ETH
-    1 ether,
-    block.timestamp + 30 days,
-    true, // Enable automation
-    "HODL for 30 days - resist FOMO!"
+    0.1 ether,
+    block.timestamp + 1 hours
 );
 ```
 
 ### Create a Price-based Vault
 
 ```solidity
-// Lock ETH until it reaches $5000
-uint256 vaultId = fumVault.createPriceVaultWithAutomation{value: 1 ether}(
+// Lock ETH until it reaches $4000
+uint256 vaultId = fumVault.createPriceVault{value: 0.1 ether}(
     address(0), // ETH
-    1 ether,
-    5000e8, // $5000 target (8 decimals)
-    true, // Enable automation
-    "Sell when ETH hits $5000"
+    0.1 ether,
+    400000000000 // $4000 target (8 decimals)
 );
 ```
 
 ### Create a Combined Vault
 
 ```solidity
-// Lock for 7 days OR until ETH hits $4000
-uint256 vaultId = fumVault.createCombinedVault{value: 1 ether}(
+// Lock for 1 day OR until ETH hits $4000
+uint256 vaultId = fumVault.createTimeOrPriceVault{value: 0.1 ether}(
     address(0), // ETH
-    1 ether,
-    block.timestamp + 7 days,
-    4000e8, // $4000 target
-    FUMVaultCore.ConditionType.TIME_OR_PRICE,
-    true, // Enable automation
-    "Exit in 1 week or at $4000"
+    0.1 ether,
+    block.timestamp + 1 days,
+    400000000000 // $4000 target
 );
 ```
 
-## 🔗 Chainlink Integration
+## Chainlink Integration
 
 ### Price Feeds
 - Real-time price data from Chainlink oracles
-- Built-in validation and circuit breakers
-- Support for ETH/USD, BTC/USD, and other major pairs
-- Fallback mechanisms for resilience
+- Support for ETH/USD, AVAX/USD, BTC/USD on Avalanche Fuji
+- Built-in staleness validation
+- 8-decimal precision pricing
 
 ### Automation
-- 24/7 automated vault condition monitoring
-- Gas-optimized batch processing
-- Configurable check intervals and limits
-- Performance tracking and metrics
+- Automated vault condition monitoring
+- 5-second check intervals for fast response
+- Batch processing for gas efficiency
+- Automatic vault unlocking when conditions are met
 
-### CCIP (Cross-Chain)
-- Cross-chain vault creation and management
-- Real-time status synchronization
-- Secure asset bridging
-- Multi-chain configuration support
+**Supported Price Feeds (Avalanche Fuji):**
+- ETH/USD: `0x86d67c3D38D2bCeE722E601025C25a575021c6EA`
+- AVAX/USD: `0x5498BB86BC934c8D34FDA08E81D444153d0D06aD`
+- BTC/USD: `0x31CF013A08c6Ac228C94551d535d5BAfE19c602a`
 
-## 📊 Supported Networks
+## Supported Networks
 
-| Network | Chain ID | Status | Price Feeds | Automation | CCIP |
-|---------|----------|--------|-------------|------------|------|
-| Ethereum Mainnet | 1 | ✅ | ✅ | ✅ | ✅ |
-| Ethereum Sepolia | 11155111 | ✅ | ✅ | ✅ | ✅ |
-| Polygon | 137 | ✅ | ✅ | ✅ | ✅ |
-| Arbitrum One | 42161 | ✅ | ✅ | ✅ | ✅ |
-| Base | 8453 | ✅ | ✅ | ✅ | ✅ |
-| Avalanche C-Chain | 43114 | ✅ | ✅ | ✅ | ✅ |
+| Network | Chain ID | Status | Contract Address |
+|---------|----------|--------|------------------|
+| Avalanche Fuji (Testnet) | 43113 | ✅ Deployed | `0x5274A2153cF842E3bD1D4996E01d567750d0e739` |
 
-## 🧪 Testing
+**Current Deployment:**
+- **Network**: Avalanche Fuji Testnet
+- **Contract**: `0x5274A2153cF842E3bD1D4996E01d567750d0e739`
+- **Explorer**: [View on Snowtrace](https://testnet.snowtrace.io/address/0x5274A2153cF842E3bD1D4996E01d567750d0e739)
+
+## Testing
 
 The project includes comprehensive tests covering:
 
-- ✅ Vault creation with different condition types
-- ✅ Time-based and price-based unlocking
-- ✅ Emergency withdrawal system
-- ✅ Price feed validation and circuit breakers
-- ✅ Automation condition checking
-- ✅ Access control and security
-- ✅ Fee calculation and distribution
-- ✅ Edge cases and error handling
+- Vault creation with different condition types
+- Time-based and price-based unlocking
+- Emergency withdrawal system with penalties
+- Price feed validation and staleness checks
+- Chainlink automation integration
+- Access control and security measures
+- Error conditions and edge cases
 
 ```bash
 # Run all tests
 forge test
 
 # Run specific test file
-forge test --match-contract FUMVaultCompleteTest
+forge test --match-contract FUMVaultTest
 
 # Run with verbosity for debugging
 forge test -vvv
@@ -212,78 +188,90 @@ forge test -vvv
 forge coverage --report lcov
 ```
 
-## 🛡️ Security
+## Security
 
 ### Security Measures
 - **ReentrancyGuard**: Protection against reentrancy attacks
-- **Access Control**: Proper role-based permissions
+- **Access Control**: Owner-based permissions with proper validation
 - **Input Validation**: Comprehensive parameter checking
-- **Circuit Breakers**: Price feed anomaly detection
-- **Emergency Pause**: Contract-wide pause functionality
+- **Price Feed Validation**: Staleness and sanity checks
+- **Emergency System**: 10% penalty for immediate withdrawals
+- **Pausable**: Contract can be paused in emergencies
 
-### Audits
-- [ ] Internal security review completed
-- [ ] External audit scheduled
-- [ ] Bug bounty program planned
+### Security Status
+- Internal security review: In progress
+- External audit: Planned for production deployment
+- Testnet deployment: Active for testing
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 fund-ur-memory-contract/
 ├── src/
 │   ├── FUMVault.sol              # Main vault contract
-│   ├── FUMVaultCore.sol          # Core functionality
-│   ├── modules/
-│   │   ├── ChainlinkPriceFeedModule.sol
-│   │   ├── ChainlinkAutomationModule.sol
-│   │   └── ChainlinkCCIPModule.sol
-│   ├── interfaces/
-│   │   └── IFUMVaultComplete.sol
-│   ├── MockPriceFeed.sol         # Testing utilities
-│   └── MockTokens.sol
-├── script/
-│   └── DeployFUMVault.s.sol      # Deployment script
+│   └── interfaces/
+│       └── IFUMVault.sol         # Contract interface
+├── script/                       # Essential scripts only
+│   ├── DeployFUM.s.sol          # Deployment script
+│   ├── SetupFUM.s.sol           # Configuration script
+│   ├── ManageVaults.s.sol       # Vault management
+│   ├── ViewUnlockedVaults.s.sol # Monitoring script
+│   ├── ClaimUnlockedVaults.s.sol # Claiming script
+│   ├── EmergencyOperations.s.sol # Emergency functions
+│   ├── MonitorAutomation.s.sol  # Automation monitoring
+│   └── QuickTest.s.sol          # Basic testing
 ├── test/
-│   └── FUMVaultComplete.t.sol    # Comprehensive tests
+│   └── FUMVault.t.sol           # Comprehensive tests
 ├── docs/
-│   └── FUM_VAULT_COMPLETE_DOCUMENTATION.md
-└── foundry.toml                  # Foundry configuration
+│   ├── FRONTEND_INTEGRATION_GUIDE.md
+│   ├── ESSENTIAL_SCRIPTS.md
+│   └── VAULT_MANAGEMENT_GUIDE.md
+└── foundry.toml                 # Foundry configuration
 ```
 
-## 🤝 Contributing
+## Available Scripts
 
-We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
+### Essential Operations
+```bash
+# Deploy contract
+forge script script/DeployFUM.s.sol --rpc-url $FUJI_RPC_URL --broadcast
 
-### Development Setup
+# Setup configuration
+forge script script/SetupFUM.s.sol --rpc-url $FUJI_RPC_URL --broadcast
+
+# Create test vaults
+forge script script/ManageVaults.s.sol:CreateVaults --rpc-url $FUJI_RPC_URL --broadcast
+
+# Monitor vaults
+forge script script/ViewUnlockedVaults.s.sol:ViewUnlockedVaults --rpc-url $FUJI_RPC_URL
+
+# Claim ready vaults
+forge script script/ClaimUnlockedVaults.s.sol:ClaimUnlockedVaults --rpc-url $FUJI_RPC_URL --broadcast
+
+# Emergency withdrawal
+VAULT_ID=1 forge script script/EmergencyOperations.s.sol:EmergencyWithdrawal --rpc-url $FUJI_RPC_URL --broadcast
+```
+
+## Documentation
+
+- **[Frontend Integration Guide](docs/FRONTEND_INTEGRATION_GUIDE.md)** - Complete guide for frontend developers
+- **[Essential Scripts](docs/ESSENTIAL_SCRIPTS.md)** - Overview of all available scripts
+- **[Vault Management Guide](docs/VAULT_MANAGEMENT_GUIDE.md)** - Detailed vault operations
+
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch
-3. Make your changes
-4. Add tests for new functionality
-5. Ensure all tests pass
-6. Submit a pull request
+3. Add tests for new functionality
+4. Ensure all tests pass: `forge test`
+5. Submit a pull request
 
-## 📄 License
+## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License.
 
-## 🔗 Links
+## Acknowledgments
 
-- **Documentation**: [Full Documentation](docs/FUM_VAULT_COMPLETE_DOCUMENTATION.md)
-- **Website**: [fumvault.com](https://fumvault.com)
-- **Discord**: [Join our community](https://discord.gg/fumvault)
-- **Twitter**: [@FUMVault](https://twitter.com/FUMVault)
-
-## 🙏 Acknowledgments
-
-- [Chainlink](https://chain.link/) for providing reliable oracle infrastructure
-- [OpenZeppelin](https://openzeppelin.com/) for secure smart contract libraries
-- [Foundry](https://getfoundry.sh/) for the excellent development toolkit
-
-## ⚠️ Disclaimer
-
-This software is experimental and provided "as is". Use at your own risk. Always do your own research and consider the risks before using any DeFi protocol.
-
----
-
-**Built with ❤️ by the F.U.M Protocol Team**
+- [Chainlink](https://chain.link/) for oracle infrastructure
+- [OpenZeppelin](https://openzeppelin.com/) for security libraries
+- [Foundry](https://getfoundry.sh/) for development tools
