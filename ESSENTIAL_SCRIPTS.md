@@ -1,17 +1,17 @@
-# Essential F.U.M Scripts
+# Essential Cipher Scripts
 
 This document lists the essential scripts kept in the project after cleanup.
 
 ## Core Scripts (8 Essential Files)
 
-### 1. **DeployFUM.s.sol**
-- **Purpose**: Deploy F.U.M contract to Avalanche Fuji
-- **Usage**: `forge script script/DeployFUM.s.sol --rpc-url $FUJI_RPC_URL --broadcast`
-- **Description**: Core deployment script that creates the FUMVault contract
+### 1. **DeployCipher.s.sol**
+- **Purpose**: Deploy Cipher contract to Avalanche Fuji
+- **Usage**: `forge script script/DeployCipher.s.sol --rpc-url $FUJI_RPC_URL --broadcast`
+- **Description**: Core deployment script that creates the CipherVault contract
 
-### 2. **SetupFUM.s.sol**
+### 2. **SetupCipher.s.sol**
 - **Purpose**: Configure token support and price feeds
-- **Usage**: `forge script script/SetupFUM.s.sol --rpc-url $FUJI_RPC_URL --broadcast`
+- **Usage**: `forge script script/SetupCipher.s.sol --rpc-url $FUJI_RPC_URL --broadcast`
 - **Description**: Essential configuration script that sets up ETH/AVAX support and price feeds
 
 ### 3. **ManageVaults.s.sol**

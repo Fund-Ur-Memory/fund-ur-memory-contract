@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-/// @title IFUMVault Interface
-/// @notice Interface for the FUM Vault contract
+/// @title ICipherVault Interface
+/// @notice Interface for the Cipher Vault contract
 /// @dev This interface defines all external functions for easy integration
-interface IFUMVault {
+interface ICipherVault {
 
     // =============================================================
     //                           TYPES

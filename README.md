@@ -1,4 +1,4 @@
-# F.U.M Vault - Fund Ur Memory
+# Cipher Vault - Commitment Protocol
 
 > **DeFi commitment contracts for automated asset management with time and price conditions**
 
@@ -6,7 +6,7 @@
 [![Foundry](https://img.shields.io/badge/Built%20with-Foundry-FFDB1C.svg)](https://getfoundry.sh/)
 [![Chainlink](https://img.shields.io/badge/Powered%20by-Chainlink-375BD2.svg)](https://chain.link/)
 
-F.U.M Vault is a DeFi protocol that allows users to lock assets with customizable time and price conditions. The protocol uses Chainlink price feeds and automation to automatically unlock vaults when conditions are met, helping users implement disciplined investment strategies.
+Cipher Vault is a DeFi protocol that allows users to lock assets with customizable time and price conditions. The protocol uses Chainlink price feeds and automation to automatically unlock vaults when conditions are met, helping users implement disciplined investment strategies through encoded commitment mechanisms.
 
 ## Key Features
 
@@ -21,9 +21,9 @@ F.U.M Vault is a DeFi protocol that allows users to lock assets with customizabl
 
 ## Architecture
 
-The F.U.M protocol consists of a single main contract with modular functionality:
+The Cipher protocol consists of a single main contract with modular functionality:
 
-- **FUMVault.sol**: Main contract handling vault creation, management, and withdrawals
+- **CipherVault.sol**: Main contract handling vault creation, management, and withdrawals
 - **Chainlink Integration**: Price feeds and automation for condition monitoring
 - **Emergency System**: Penalty-based emergency withdrawal mechanism
 
@@ -40,7 +40,7 @@ The F.U.M protocol consists of a single main contract with modular functionality
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd fund-ur-memory-contract
+cd cipher-contract
 
 # Install dependencies
 forge install
@@ -48,7 +48,7 @@ forge install
 # Set up environment variables
 export PRIVATE_KEY="your_private_key_here"
 export FUJI_RPC_URL="https://api.avax-test.network/ext/bc/C/rpc"
-export FUM_VAULT_ADDRESS="0x5274A2153cF842E3bD1D4996E01d567750d0e739"
+export CIPHER_VAULT_ADDRESS="0x5274A2153cF842E3bD1D4996E01d567750d0e739"
 ```
 
 ### Build and Test
@@ -82,10 +82,10 @@ forge coverage
 
 ```bash
 # Deploy to Avalanche Fuji testnet
-forge script script/DeployFUM.s.sol --rpc-url $FUJI_RPC_URL --broadcast
+forge script script/DeployCipher.s.sol --rpc-url $FUJI_RPC_URL --broadcast
 
 # Setup contract configuration
-forge script script/SetupFUM.s.sol --rpc-url $FUJI_RPC_URL --broadcast
+forge script script/SetupCipher.s.sol --rpc-url $FUJI_RPC_URL --broadcast
 
 # Test deployment
 forge script script/QuickTest.s.sol --rpc-url $FUJI_RPC_URL
@@ -102,7 +102,7 @@ forge script script/ManageVaults.s.sol:CreateVaults --rpc-url $FUJI_RPC_URL --br
 
 ```solidity
 // Lock 0.1 ETH for 1 hour
-uint256 vaultId = fumVault.createTimeVault{value: 0.1 ether}(
+uint256 vaultId = cipherVault.createTimeVault{value: 0.1 ether}(
     address(0), // ETH
     0.1 ether,
     block.timestamp + 1 hours
@@ -113,7 +113,7 @@ uint256 vaultId = fumVault.createTimeVault{value: 0.1 ether}(
 
 ```solidity
 // Lock ETH until it reaches $4000
-uint256 vaultId = fumVault.createPriceVault{value: 0.1 ether}(
+uint256 vaultId = cipherVault.createPriceVault{value: 0.1 ether}(
     address(0), // ETH
     0.1 ether,
     400000000000 // $4000 target (8 decimals)
@@ -124,7 +124,7 @@ uint256 vaultId = fumVault.createPriceVault{value: 0.1 ether}(
 
 ```solidity
 // Lock for 1 day OR until ETH hits $4000
-uint256 vaultId = fumVault.createTimeOrPriceVault{value: 0.1 ether}(
+uint256 vaultId = cipherVault.createTimeOrPriceVault{value: 0.1 ether}(
     address(0), // ETH
     0.1 ether,
     block.timestamp + 1 days,
@@ -206,14 +206,14 @@ forge coverage --report lcov
 ## Project Structure
 
 ```
-fund-ur-memory-contract/
+cipher-contract/
 ├── src/
-│   ├── FUMVault.sol              # Main vault contract
+│   ├── CipherVault.sol           # Main vault contract
 │   └── interfaces/
-│       └── IFUMVault.sol         # Contract interface
+│       └── ICipherVault.sol      # Contract interface
 ├── script/                       # Essential scripts only
-│   ├── DeployFUM.s.sol          # Deployment script
-│   ├── SetupFUM.s.sol           # Configuration script
+│   ├── DeployCipher.s.sol       # Deployment script
+│   ├── SetupCipher.s.sol        # Configuration script
 │   ├── ManageVaults.s.sol       # Vault management
 │   ├── ViewUnlockedVaults.s.sol # Monitoring script
 │   ├── ClaimUnlockedVaults.s.sol # Claiming script
@@ -221,7 +221,7 @@ fund-ur-memory-contract/
 │   ├── MonitorAutomation.s.sol  # Automation monitoring
 │   └── QuickTest.s.sol          # Basic testing
 ├── test/
-│   └── FUMVault.t.sol           # Comprehensive tests
+│   └── CipherVault.t.sol        # Comprehensive tests
 ├── docs/
 │   ├── FRONTEND_INTEGRATION_GUIDE.md
 │   ├── ESSENTIAL_SCRIPTS.md
@@ -234,10 +234,10 @@ fund-ur-memory-contract/
 ### Essential Operations
 ```bash
 # Deploy contract
-forge script script/DeployFUM.s.sol --rpc-url $FUJI_RPC_URL --broadcast
+forge script script/DeployCipher.s.sol --rpc-url $FUJI_RPC_URL --broadcast
 
 # Setup configuration
-forge script script/SetupFUM.s.sol --rpc-url $FUJI_RPC_URL --broadcast
+forge script script/SetupCipher.s.sol --rpc-url $FUJI_RPC_URL --broadcast
 
 # Create test vaults
 forge script script/ManageVaults.s.sol:CreateVaults --rpc-url $FUJI_RPC_URL --broadcast

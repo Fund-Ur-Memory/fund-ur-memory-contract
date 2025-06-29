@@ -1,6 +1,6 @@
-# F.U.M Frontend Integration Guide
+# Cipher Frontend Integration Guide
 
-Complete guide for frontend developers to integrate with the F.U.M (Fund Ur Memory) smart contract.
+Complete guide for frontend developers to integrate with the Cipher Protocol smart contract.
 
 ## Table of Contents
 1. [Contract Overview](#contract-overview)
@@ -14,7 +14,7 @@ Complete guide for frontend developers to integrate with the F.U.M (Fund Ur Memo
 
 ## Contract Overview
 
-F.U.M is a DeFi vault system that allows users to lock assets with time and/or price conditions. Users can create vaults that unlock when:
+Cipher is a DeFi vault system that allows users to lock assets with time and/or price conditions. Users can create vaults that unlock when:
 - **Time condition**: After a specific timestamp
 - **Price condition**: When token price reaches target
 - **Combined conditions**: Time OR Price, or Time AND Price
