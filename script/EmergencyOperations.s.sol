@@ -3,13 +3,13 @@ pragma solidity ^0.8.24;
 
 import "forge-std/Script.sol";
 import "forge-std/console.sol";
-import "../src/FUMVault.sol";
+import "../src/CipherVault.sol";
 
 /// @title EmergencyWithdrawal - Script untuk emergency withdrawal dengan penalty 10%
 /// @notice Script ini akan melakukan emergency withdrawal dari vault tertentu
 contract EmergencyWithdrawal is Script {
 
-    address constant FUM_VAULT_ADDRESS = 0x5274A2153cF842E3bD1D4996E01d567750d0e739;
+    address constant CIPHER_VAULT_ADDRESS = 0x5274A2153cF842E3bD1D4996E01d567750d0e739;
 
     function run() external {
         // Get vault ID from environment
@@ -21,13 +21,13 @@ contract EmergencyWithdrawal is Script {
         console.log("WARNING: This will incur a 10% penalty!");
         console.log("User Address:", userAddress);
         console.log("Vault ID:", vaultId);
-        console.log("Contract Address:", FUM_VAULT_ADDRESS);
+        console.log("Contract Address:", CIPHER_VAULT_ADDRESS);
         console.log("");
 
-        FUMVault fumVault = FUMVault(payable(FUM_VAULT_ADDRESS));
+        CipherVault cipherVault = CipherVault(payable(CIPHER_VAULT_ADDRESS));
 
         // Get vault info first
-        try fumVault.getVault(vaultId) returns (FUMVault.Vault memory vault) {
+        try cipherVault.getVault(vaultId) returns (CipherVault.Vault memory vault) {
             console.log("--- Vault Information ---");
             console.log("Owner:", vault.owner);
             console.log("Token:", vault.token == address(0) ? "ETH" : addressToString(vault.token));
@@ -42,13 +42,13 @@ contract EmergencyWithdrawal is Script {
             }
 
             // Check if vault is active
-            if (vault.status != FUMVault.VaultStatus.ACTIVE) {
+            if (vault.status != CipherVault.VaultStatus.ACTIVE) {
                 console.log("ERROR: Vault is not active. Current status:", getStatusString(vault.status));
                 return;
             }
 
             // Calculate penalty
-            uint256 penalty = fumVault.calculateEmergencyPenalty(vault.amount);
+            uint256 penalty = cipherVault.calculateEmergencyPenalty(vault.amount);
             uint256 withdrawAmount = vault.amount - penalty;
 
             console.log("--- Emergency Withdrawal Details ---");
@@ -63,7 +63,7 @@ contract EmergencyWithdrawal is Script {
 
             vm.startBroadcast(deployerPrivateKey);
 
-            try fumVault.executeEmergencyWithdrawal(vaultId) {
+            try cipherVault.executeEmergencyWithdrawal(vaultId) {
                 console.log("Emergency withdrawal successful!");
                 console.log("Received:", withdrawAmount / 1e18, "ETH");
                 console.log("Penalty of", penalty / 1e18, "ETH will be claimable after 3 months");
@@ -80,11 +80,11 @@ contract EmergencyWithdrawal is Script {
         }
     }
 
-    function getStatusString(FUMVault.VaultStatus status) internal pure returns (string memory) {
-        if (status == FUMVault.VaultStatus.ACTIVE) return "ACTIVE";
-        if (status == FUMVault.VaultStatus.UNLOCKED) return "UNLOCKED";
-        if (status == FUMVault.VaultStatus.WITHDRAWN) return "WITHDRAWN";
-        if (status == FUMVault.VaultStatus.EMERGENCY) return "EMERGENCY";
+    function getStatusString(CipherVault.VaultStatus status) internal pure returns (string memory) {
+        if (status == CipherVault.VaultStatus.ACTIVE) return "ACTIVE";
+        if (status == CipherVault.VaultStatus.UNLOCKED) return "UNLOCKED";
+        if (status == CipherVault.VaultStatus.WITHDRAWN) return "WITHDRAWN";
+        if (status == CipherVault.VaultStatus.EMERGENCY) return "EMERGENCY";
         return "UNKNOWN";
     }
 
@@ -106,7 +106,7 @@ contract EmergencyWithdrawal is Script {
 /// @notice Script ini akan claim penalty dari emergency withdrawal setelah 3 bulan
 contract ClaimEmergencyPenalty is Script {
 
-    address constant FUM_VAULT_ADDRESS = 0x5274A2153cF842E3bD1D4996E01d567750d0e739;
+    address constant CIPHER_VAULT_ADDRESS = 0x5274A2153cF842E3bD1D4996E01d567750d0e739;
 
     function run() external {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
@@ -114,13 +114,13 @@ contract ClaimEmergencyPenalty is Script {
 
         console.log("=== Claim Emergency Penalty ===");
         console.log("User Address:", userAddress);
-        console.log("Contract Address:", FUM_VAULT_ADDRESS);
+        console.log("Contract Address:", CIPHER_VAULT_ADDRESS);
         console.log("");
 
-        FUMVault fumVault = FUMVault(payable(FUM_VAULT_ADDRESS));
+        CipherVault cipherVault = CipherVault(payable(CIPHER_VAULT_ADDRESS));
 
         // Get penalty info
-        try fumVault.getEmergencyPenalty(userAddress) returns (FUMVault.EmergencyPenalty memory penalty) {
+        try cipherVault.getEmergencyPenalty(userAddress) returns (CipherVault.EmergencyPenalty memory penalty) {
             console.log("--- Penalty Information ---");
             console.log("Penalty Amount:", penalty.amount / 1e18, "ETH");
             console.log("Penalty Time:", penalty.penaltyTime);
@@ -157,7 +157,7 @@ contract ClaimEmergencyPenalty is Script {
 
             vm.startBroadcast(deployerPrivateKey);
 
-            try fumVault.claimEmergencyPenalty() {
+            try cipherVault.claimEmergencyPenalty() {
                 console.log("Successfully claimed penalty of", penalty.amount / 1e18, "ETH!");
             } catch Error(string memory reason) {
                 console.log("Failed to claim penalty - Reason:", reason);
@@ -176,7 +176,7 @@ contract ClaimEmergencyPenalty is Script {
 /// @title CheckEmergencyPenalty - Script untuk check status penalty tanpa claim
 contract CheckEmergencyPenalty is Script {
 
-    address constant FUM_VAULT_ADDRESS = 0x5274A2153cF842E3bD1D4996E01d567750d0e739;
+    address constant CIPHER_VAULT_ADDRESS = 0x5274A2153cF842E3bD1D4996E01d567750d0e739;
 
     function run() external view {
         // Get user address from environment or use msg.sender
@@ -184,12 +184,12 @@ contract CheckEmergencyPenalty is Script {
 
         console.log("=== Check Emergency Penalty Status ===");
         console.log("User Address:", userAddress);
-        console.log("Contract Address:", FUM_VAULT_ADDRESS);
+        console.log("Contract Address:", CIPHER_VAULT_ADDRESS);
         console.log("");
 
-        FUMVault fumVault = FUMVault(payable(FUM_VAULT_ADDRESS));
+        CipherVault cipherVault = CipherVault(payable(CIPHER_VAULT_ADDRESS));
 
-        try fumVault.getEmergencyPenalty(userAddress) returns (FUMVault.EmergencyPenalty memory penalty) {
+        try cipherVault.getEmergencyPenalty(userAddress) returns (CipherVault.EmergencyPenalty memory penalty) {
             console.log("--- Penalty Information ---");
             console.log("Penalty Amount:", penalty.amount / 1e18, "ETH");
 

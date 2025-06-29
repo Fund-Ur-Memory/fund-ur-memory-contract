@@ -3,24 +3,24 @@ pragma solidity ^0.8.24;
 
 import "forge-std/Script.sol";
 import "forge-std/console.sol";
-import "../src/FUMVault.sol";
+import "../src/CipherVault.sol";
 
 /// @title ViewUnlockedVaults - Script untuk melihat vault yang sudah unlocked
 /// @notice Script ini akan scan semua vault dan tampilkan yang statusnya UNLOCKED
 contract ViewUnlockedVaults is Script {
 
     // Contract address di Avalanche Fuji
-    address constant FUM_VAULT_ADDRESS = 0x5274A2153cF842E3bD1D4996E01d567750d0e739;
+    address constant CIPHER_VAULT_ADDRESS = 0x5274A2153cF842E3bD1D4996E01d567750d0e739;
 
     function run() external view {
         console.log("=== Scanning for Unlocked Vaults ===");
-        console.log("Contract Address:", FUM_VAULT_ADDRESS);
+        console.log("Contract Address:", CIPHER_VAULT_ADDRESS);
         console.log("");
 
-        FUMVault fumVault = FUMVault(payable(FUM_VAULT_ADDRESS));
+        CipherVault cipherVault = CipherVault(payable(CIPHER_VAULT_ADDRESS));
 
         // Get total number of vaults
-        (uint256 totalVaults, uint256 contractBalance) = fumVault.getContractStats();
+        (uint256 totalVaults, uint256 contractBalance) = cipherVault.getContractStats();
         console.log("Total Vaults Created:", totalVaults);
         console.log("Contract ETH Balance:", contractBalance / 1e18, "ETH");
         console.log("");
@@ -31,18 +31,18 @@ contract ViewUnlockedVaults is Script {
 
         // Scan through all vaults
         for (uint256 vaultId = 1; vaultId <= totalVaults; vaultId++) {
-            try fumVault.getVault(vaultId) returns (FUMVault.Vault memory vault) {
+            try cipherVault.getVault(vaultId) returns (CipherVault.Vault memory vault) {
                 if (vault.owner == address(0)) continue; // Skip empty vaults
 
                 string memory statusStr = getStatusString(vault.status);
                 string memory conditionStr = getConditionString(vault.conditionType);
 
                 // Count by status
-                if (vault.status == FUMVault.VaultStatus.UNLOCKED) {
+                if (vault.status == CipherVault.VaultStatus.UNLOCKED) {
                     unlockedCount++;
-                } else if (vault.status == FUMVault.VaultStatus.ACTIVE) {
+                } else if (vault.status == CipherVault.VaultStatus.ACTIVE) {
                     activeCount++;
-                } else if (vault.status == FUMVault.VaultStatus.WITHDRAWN) {
+                } else if (vault.status == CipherVault.VaultStatus.WITHDRAWN) {
                     withdrawnCount++;
                 }
 
@@ -64,7 +64,7 @@ contract ViewUnlockedVaults is Script {
                 }
 
                 if (vault.targetPrice > 0) {
-                    try fumVault.getCurrentPrice(vault.token) returns (uint256 currentPrice) {
+                    try cipherVault.getCurrentPrice(vault.token) returns (uint256 currentPrice) {
                         console.log("Target Price:", vault.targetPrice / 1e8, "USD");
                         console.log("Current Price:", currentPrice / 1e8, "USD");
                         if (currentPrice >= vault.targetPrice) {
@@ -78,7 +78,7 @@ contract ViewUnlockedVaults is Script {
                 }
 
                 // Check if conditions are met
-                try fumVault.checkConditions(vaultId) returns (bool conditionsMet) {
+                try cipherVault.checkConditions(vaultId) returns (bool conditionsMet) {
                     console.log("Overall Conditions Met:", conditionsMet ? "YES" : "NO");
                 } catch {
                     console.log("Overall Conditions Met: ERROR");
@@ -108,19 +108,19 @@ contract ViewUnlockedVaults is Script {
         }
     }
 
-    function getStatusString(FUMVault.VaultStatus status) internal pure returns (string memory) {
-        if (status == FUMVault.VaultStatus.ACTIVE) return "ACTIVE";
-        if (status == FUMVault.VaultStatus.UNLOCKED) return "UNLOCKED";
-        if (status == FUMVault.VaultStatus.WITHDRAWN) return "WITHDRAWN";
-        if (status == FUMVault.VaultStatus.EMERGENCY) return "EMERGENCY";
+    function getStatusString(CipherVault.VaultStatus status) internal pure returns (string memory) {
+        if (status == CipherVault.VaultStatus.ACTIVE) return "ACTIVE";
+        if (status == CipherVault.VaultStatus.UNLOCKED) return "UNLOCKED";
+        if (status == CipherVault.VaultStatus.WITHDRAWN) return "WITHDRAWN";
+        if (status == CipherVault.VaultStatus.EMERGENCY) return "EMERGENCY";
         return "UNKNOWN";
     }
 
-    function getConditionString(FUMVault.ConditionType conditionType) internal pure returns (string memory) {
-        if (conditionType == FUMVault.ConditionType.TIME_ONLY) return "TIME_ONLY";
-        if (conditionType == FUMVault.ConditionType.PRICE_ONLY) return "PRICE_ONLY";
-        if (conditionType == FUMVault.ConditionType.TIME_OR_PRICE) return "TIME_OR_PRICE";
-        if (conditionType == FUMVault.ConditionType.TIME_AND_PRICE) return "TIME_AND_PRICE";
+    function getConditionString(CipherVault.ConditionType conditionType) internal pure returns (string memory) {
+        if (conditionType == CipherVault.ConditionType.TIME_ONLY) return "TIME_ONLY";
+        if (conditionType == CipherVault.ConditionType.PRICE_ONLY) return "PRICE_ONLY";
+        if (conditionType == CipherVault.ConditionType.TIME_OR_PRICE) return "TIME_OR_PRICE";
+        if (conditionType == CipherVault.ConditionType.TIME_AND_PRICE) return "TIME_AND_PRICE";
         return "UNKNOWN";
     }
 
@@ -141,7 +141,7 @@ contract ViewUnlockedVaults is Script {
 /// @title ViewUserVaults - Script untuk melihat vault milik user tertentu
 contract ViewUserVaults is Script {
 
-    address constant FUM_VAULT_ADDRESS = 0x5274A2153cF842E3bD1D4996E01d567750d0e739;
+    address constant CIPHER_VAULT_ADDRESS = 0x5274A2153cF842E3bD1D4996E01d567750d0e739;
 
     function run() external view {
         // Get user address from environment or use msg.sender
@@ -149,13 +149,13 @@ contract ViewUserVaults is Script {
 
         console.log("=== Viewing Vaults for User ===");
         console.log("User Address:", userAddress);
-        console.log("Contract Address:", FUM_VAULT_ADDRESS);
+        console.log("Contract Address:", CIPHER_VAULT_ADDRESS);
         console.log("");
 
-        FUMVault fumVault = FUMVault(payable(FUM_VAULT_ADDRESS));
+        CipherVault cipherVault = CipherVault(payable(CIPHER_VAULT_ADDRESS));
 
         // Get user's vault IDs
-        uint256[] memory userVaultIds = fumVault.getOwnerVaults(userAddress);
+        uint256[] memory userVaultIds = cipherVault.getOwnerVaults(userAddress);
 
         if (userVaultIds.length == 0) {
             console.log("No vaults found for this user.");
@@ -171,7 +171,7 @@ contract ViewUserVaults is Script {
         for (uint256 i = 0; i < userVaultIds.length; i++) {
             uint256 vaultId = userVaultIds[i];
 
-            try fumVault.getVault(vaultId) returns (FUMVault.Vault memory vault) {
+            try cipherVault.getVault(vaultId) returns (CipherVault.Vault memory vault) {
                 string memory statusStr = getStatusString(vault.status);
 
                 console.log("--- Vault ID:", vaultId, "---");
@@ -179,12 +179,12 @@ contract ViewUserVaults is Script {
                 console.log("Amount:", vault.amount / 1e18, "tokens");
                 console.log("Status:", statusStr);
 
-                if (vault.status == FUMVault.VaultStatus.UNLOCKED) {
+                if (vault.status == CipherVault.VaultStatus.UNLOCKED) {
                     unlockedCount++;
                     console.log("READY FOR WITHDRAWAL!");
                 }
 
-                if (vault.status == FUMVault.VaultStatus.ACTIVE || vault.status == FUMVault.VaultStatus.UNLOCKED) {
+                if (vault.status == CipherVault.VaultStatus.ACTIVE || vault.status == CipherVault.VaultStatus.UNLOCKED) {
                     totalValue += vault.amount;
                 }
 
@@ -206,11 +206,11 @@ contract ViewUserVaults is Script {
         }
     }
 
-    function getStatusString(FUMVault.VaultStatus status) internal pure returns (string memory) {
-        if (status == FUMVault.VaultStatus.ACTIVE) return "ACTIVE";
-        if (status == FUMVault.VaultStatus.UNLOCKED) return "UNLOCKED";
-        if (status == FUMVault.VaultStatus.WITHDRAWN) return "WITHDRAWN";
-        if (status == FUMVault.VaultStatus.EMERGENCY) return "EMERGENCY";
+    function getStatusString(CipherVault.VaultStatus status) internal pure returns (string memory) {
+        if (status == CipherVault.VaultStatus.ACTIVE) return "ACTIVE";
+        if (status == CipherVault.VaultStatus.UNLOCKED) return "UNLOCKED";
+        if (status == CipherVault.VaultStatus.WITHDRAWN) return "WITHDRAWN";
+        if (status == CipherVault.VaultStatus.EMERGENCY) return "EMERGENCY";
         return "UNKNOWN";
     }
 

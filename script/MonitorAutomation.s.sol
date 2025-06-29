@@ -3,31 +3,31 @@ pragma solidity ^0.8.24;
 
 import "forge-std/Script.sol";
 import "forge-std/console.sol";
-import "../src/FUMVault.sol";
+import "../src/CipherVault.sol";
 
 /// @title MonitorAutomation - Script untuk monitor status Chainlink Automation
 /// @notice Script ini akan check status automation dan vault yang ready untuk unlock
 contract MonitorAutomation is Script {
 
-    address constant FUM_VAULT_ADDRESS = 0x5274A2153cF842E3bD1D4996E01d567750d0e739;
+    address constant CIPHER_VAULT_ADDRESS = 0x5274A2153cF842E3bD1D4996E01d567750d0e739;
 
     function run() external view {
-        console.log("=== F.U.M Automation Monitor ===");
-        console.log("Contract Address:", FUM_VAULT_ADDRESS);
+        console.log("=== Cipher Automation Monitor ===");
+        console.log("Contract Address:", CIPHER_VAULT_ADDRESS);
         console.log("Timestamp:", block.timestamp);
         console.log("");
 
-        FUMVault fumVault = FUMVault(payable(FUM_VAULT_ADDRESS));
+        CipherVault cipherVault = CipherVault(payable(CIPHER_VAULT_ADDRESS));
 
         // Get contract stats
-        (uint256 totalVaults, uint256 contractBalance) = fumVault.getContractStats();
+        (uint256 totalVaults, uint256 contractBalance) = cipherVault.getContractStats();
         console.log("--- Contract Status ---");
         console.log("Total Vaults:", totalVaults);
         console.log("Contract Balance:", contractBalance / 1e18, "ETH");
 
         // Get automation settings
-        uint256 checkInterval = fumVault.checkInterval();
-        uint256 lastCheckTimestamp = fumVault.lastCheckTimestamp();
+        uint256 checkInterval = cipherVault.checkInterval();
+        uint256 lastCheckTimestamp = cipherVault.lastCheckTimestamp();
 
         console.log("Check Interval:", checkInterval, "seconds");
         console.log("Last Check:", lastCheckTimestamp);
@@ -50,7 +50,7 @@ contract MonitorAutomation is Script {
         // Check if upkeep is needed
         console.log("--- Automation Status ---");
         bool upkeepNeeded = false;
-        try fumVault.checkUpkeep("") returns (bool _upkeepNeeded, bytes memory performData) {
+        try cipherVault.checkUpkeep("") returns (bool _upkeepNeeded, bytes memory performData) {
             upkeepNeeded = _upkeepNeeded;
             if (upkeepNeeded) {
                 uint256[] memory readyVaultIds = abi.decode(performData, (uint256[]));
@@ -80,14 +80,14 @@ contract MonitorAutomation is Script {
         uint256 priceBasedReady = 0;
 
         for (uint256 vaultId = 1; vaultId <= totalVaults; vaultId++) {
-            try fumVault.getVault(vaultId) returns (FUMVault.Vault memory vault) {
+            try cipherVault.getVault(vaultId) returns (CipherVault.Vault memory vault) {
                 if (vault.owner == address(0)) continue;
 
-                if (vault.status == FUMVault.VaultStatus.ACTIVE) {
+                if (vault.status == CipherVault.VaultStatus.ACTIVE) {
                     activeCount++;
 
                     // Check conditions
-                    try fumVault.checkConditions(vaultId) returns (bool conditionsMet) {
+                    try cipherVault.checkConditions(vaultId) returns (bool conditionsMet) {
                         if (conditionsMet) {
                             readyCount++;
 
@@ -96,7 +96,7 @@ contract MonitorAutomation is Script {
                             bool priceReady = false;
 
                             if (vault.targetPrice > 0) {
-                                try fumVault.getCurrentPrice(vault.token) returns (uint256 currentPrice) {
+                                try cipherVault.getCurrentPrice(vault.token) returns (uint256 currentPrice) {
                                     priceReady = currentPrice >= vault.targetPrice;
                                 } catch {
                                     // Price feed error
@@ -144,7 +144,7 @@ contract MonitorAutomation is Script {
         tokenNames[2] = "AVAX";
 
         for (uint256 i = 0; i < tokens.length; i++) {
-            try fumVault.getDetailedPrice(tokens[i]) returns (
+            try cipherVault.getDetailedPrice(tokens[i]) returns (
                 uint256 price,
                 uint256 updatedAt,
                 bool isStale
@@ -181,7 +181,7 @@ contract MonitorAutomation is Script {
 /// @title TestAutomationFlow - Script untuk test complete automation flow
 contract TestAutomationFlow is Script {
 
-    address constant FUM_VAULT_ADDRESS = 0x5274A2153cF842E3bD1D4996E01d567750d0e739;
+    address constant CIPHER_VAULT_ADDRESS = 0x5274A2153cF842E3bD1D4996E01d567750d0e739;
 
     function run() external {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
@@ -192,13 +192,13 @@ contract TestAutomationFlow is Script {
 
         vm.startBroadcast(deployerPrivateKey);
 
-        FUMVault fumVault = FUMVault(payable(FUM_VAULT_ADDRESS));
+        CipherVault cipherVault = CipherVault(payable(CIPHER_VAULT_ADDRESS));
 
         // Create a time vault that unlocks in 1 minute (for quick testing)
         uint256 unlockTime = block.timestamp + 60; // 1 minute
 
         console.log("Creating test time vault (unlocks in 1 minute)...");
-        try fumVault.createTimeVault{value: 0.01 ether}(
+        try cipherVault.createTimeVault{value: 0.01 ether}(
             address(0), // ETH
             0.01 ether,
             unlockTime
@@ -210,10 +210,10 @@ contract TestAutomationFlow is Script {
 
             // Check initial status
             console.log("--- Initial Status ---");
-            (bool upkeepNeeded,) = fumVault.checkUpkeep("");
+            (bool upkeepNeeded,) = cipherVault.checkUpkeep("");
             console.log("Upkeep needed:", upkeepNeeded ? "YES" : "NO");
 
-            bool conditionsMet = fumVault.checkConditions(vaultId);
+            bool conditionsMet = cipherVault.checkConditions(vaultId);
             console.log("Conditions met:", conditionsMet ? "YES" : "NO");
 
             console.log("");

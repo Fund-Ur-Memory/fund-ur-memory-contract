@@ -3,14 +3,14 @@ pragma solidity ^0.8.24;
 
 import "forge-std/Script.sol";
 import "forge-std/console.sol";
-import "../src/FUMVault.sol";
+import "../src/CipherVault.sol";
 
 /// @title ClaimUnlockedVaults - Script untuk claim vault yang sudah unlocked
 /// @notice Script ini akan otomatis claim semua vault yang sudah unlocked milik user
 contract ClaimUnlockedVaults is Script {
 
     // Contract address di Avalanche Fuji
-    address constant FUM_VAULT_ADDRESS = 0x5274A2153cF842E3bD1D4996E01d567750d0e739;
+    address constant CIPHER_VAULT_ADDRESS = 0x5274A2153cF842E3bD1D4996E01d567750d0e739;
 
     function run() external {
         // Get private key from environment
@@ -19,15 +19,15 @@ contract ClaimUnlockedVaults is Script {
 
         console.log("=== Claiming Unlocked Vaults ===");
         console.log("User Address:", userAddress);
-        console.log("Contract Address:", FUM_VAULT_ADDRESS);
+        console.log("Contract Address:", CIPHER_VAULT_ADDRESS);
         console.log("");
 
         vm.startBroadcast(deployerPrivateKey);
 
-        FUMVault fumVault = FUMVault(payable(FUM_VAULT_ADDRESS));
+        CipherVault cipherVault = CipherVault(payable(CIPHER_VAULT_ADDRESS));
 
         // Get user's vault IDs
-        uint256[] memory userVaultIds = fumVault.getOwnerVaults(userAddress);
+        uint256[] memory userVaultIds = cipherVault.getOwnerVaults(userAddress);
 
         if (userVaultIds.length == 0) {
             console.log("No vaults found for this user");
@@ -47,16 +47,16 @@ contract ClaimUnlockedVaults is Script {
         for (uint256 i = 0; i < userVaultIds.length; i++) {
             uint256 vaultId = userVaultIds[i];
 
-            try fumVault.getVault(vaultId) returns (FUMVault.Vault memory vault) {
+            try cipherVault.getVault(vaultId) returns (CipherVault.Vault memory vault) {
                 console.log("--- Processing Vault ID:", vaultId, "---");
                 console.log("Amount:", vault.amount / 1e18, "ETH");
                 console.log("Status:", getStatusString(vault.status));
 
                 // Check if vault is unlocked or can be unlocked
-                if (vault.status == FUMVault.VaultStatus.UNLOCKED) {
+                if (vault.status == CipherVault.VaultStatus.UNLOCKED) {
                     console.log("Vault is UNLOCKED - attempting withdrawal...");
 
-                    try fumVault.withdrawVault(vaultId) {
+                    try cipherVault.withdrawVault(vaultId) {
                         console.log("Successfully withdrew", vault.amount / 1e18, "ETH from vault", vaultId);
                         claimedCount++;
                         totalClaimed += vault.amount;
@@ -68,13 +68,13 @@ contract ClaimUnlockedVaults is Script {
                         failedCount++;
                     }
 
-                } else if (vault.status == FUMVault.VaultStatus.ACTIVE) {
+                } else if (vault.status == CipherVault.VaultStatus.ACTIVE) {
                     // Check if conditions are met and try to unlock + withdraw
-                    try fumVault.checkConditions(vaultId) returns (bool conditionsMet) {
+                    try cipherVault.checkConditions(vaultId) returns (bool conditionsMet) {
                         if (conditionsMet) {
                             console.log("Conditions are met - attempting withdrawal...");
 
-                            try fumVault.withdrawVault(vaultId) {
+                            try cipherVault.withdrawVault(vaultId) {
                                 console.log("Successfully unlocked and withdrew", vault.amount / 1e18, "ETH from vault", vaultId);
                                 claimedCount++;
                                 totalClaimed += vault.amount;
@@ -93,7 +93,7 @@ contract ClaimUnlockedVaults is Script {
                         failedCount++;
                     }
 
-                } else if (vault.status == FUMVault.VaultStatus.WITHDRAWN) {
+                } else if (vault.status == CipherVault.VaultStatus.WITHDRAWN) {
                     console.log("Already withdrawn - skipping");
                 } else {
                     console.log("Status:", getStatusString(vault.status), "- skipping");
@@ -128,11 +128,11 @@ contract ClaimUnlockedVaults is Script {
         }
     }
 
-    function getStatusString(FUMVault.VaultStatus status) internal pure returns (string memory) {
-        if (status == FUMVault.VaultStatus.ACTIVE) return "ACTIVE";
-        if (status == FUMVault.VaultStatus.UNLOCKED) return "UNLOCKED";
-        if (status == FUMVault.VaultStatus.WITHDRAWN) return "WITHDRAWN";
-        if (status == FUMVault.VaultStatus.EMERGENCY) return "EMERGENCY";
+    function getStatusString(CipherVault.VaultStatus status) internal pure returns (string memory) {
+        if (status == CipherVault.VaultStatus.ACTIVE) return "ACTIVE";
+        if (status == CipherVault.VaultStatus.UNLOCKED) return "UNLOCKED";
+        if (status == CipherVault.VaultStatus.WITHDRAWN) return "WITHDRAWN";
+        if (status == CipherVault.VaultStatus.EMERGENCY) return "EMERGENCY";
         return "UNKNOWN";
     }
 }
@@ -140,7 +140,7 @@ contract ClaimUnlockedVaults is Script {
 /// @title ClaimSpecificVault - Script untuk claim vault tertentu berdasarkan ID
 contract ClaimSpecificVault is Script {
 
-    address constant FUM_VAULT_ADDRESS = 0x5274A2153cF842E3bD1D4996E01d567750d0e739;
+    address constant CIPHER_VAULT_ADDRESS = 0x5274A2153cF842E3bD1D4996E01d567750d0e739;
 
     function run() external {
         // Get vault ID from environment
@@ -151,15 +151,15 @@ contract ClaimSpecificVault is Script {
         console.log("=== Claiming Specific Vault ===");
         console.log("User Address:", userAddress);
         console.log("Vault ID:", vaultId);
-        console.log("Contract Address:", FUM_VAULT_ADDRESS);
+        console.log("Contract Address:", CIPHER_VAULT_ADDRESS);
         console.log("");
 
         vm.startBroadcast(deployerPrivateKey);
 
-        FUMVault fumVault = FUMVault(payable(FUM_VAULT_ADDRESS));
+        CipherVault cipherVault = CipherVault(payable(CIPHER_VAULT_ADDRESS));
 
         // Get vault info
-        try fumVault.getVault(vaultId) returns (FUMVault.Vault memory vault) {
+        try cipherVault.getVault(vaultId) returns (CipherVault.Vault memory vault) {
             console.log("--- Vault Information ---");
             console.log("Owner:", vault.owner);
             console.log("Token:", vault.token == address(0) ? "ETH" : addressToString(vault.token));
@@ -177,10 +177,10 @@ contract ClaimSpecificVault is Script {
             }
 
             // Check status and attempt withdrawal
-            if (vault.status == FUMVault.VaultStatus.UNLOCKED) {
+            if (vault.status == CipherVault.VaultStatus.UNLOCKED) {
                 console.log("Vault is UNLOCKED - attempting withdrawal...");
 
-                try fumVault.withdrawVault(vaultId) {
+                try cipherVault.withdrawVault(vaultId) {
                     console.log("Successfully withdrew", vault.amount / 1e18, "tokens from vault", vaultId);
                 } catch Error(string memory reason) {
                     console.log("Failed to withdraw vault - Reason:", reason);
@@ -188,14 +188,14 @@ contract ClaimSpecificVault is Script {
                     console.log("Failed to withdraw vault - Unknown error");
                 }
 
-            } else if (vault.status == FUMVault.VaultStatus.ACTIVE) {
+            } else if (vault.status == CipherVault.VaultStatus.ACTIVE) {
                 console.log("Vault is ACTIVE - checking conditions...");
 
-                try fumVault.checkConditions(vaultId) returns (bool conditionsMet) {
+                try cipherVault.checkConditions(vaultId) returns (bool conditionsMet) {
                     if (conditionsMet) {
                         console.log("Conditions are met - attempting withdrawal...");
 
-                        try fumVault.withdrawVault(vaultId) {
+                        try cipherVault.withdrawVault(vaultId) {
                             console.log("Successfully unlocked and withdrew", vault.amount / 1e18, "tokens from vault", vaultId);
                         } catch Error(string memory reason) {
                             console.log("Failed to withdraw vault - Reason:", reason);
@@ -216,7 +216,7 @@ contract ClaimSpecificVault is Script {
                         }
 
                         if (vault.targetPrice > 0) {
-                            try fumVault.getCurrentPrice(vault.token) returns (uint256 currentPrice) {
+                            try cipherVault.getCurrentPrice(vault.token) returns (uint256 currentPrice) {
                                 console.log("Target Price:", vault.targetPrice / 1e8, "USD");
                                 console.log("Current Price:", currentPrice / 1e8, "USD");
                                 if (currentPrice >= vault.targetPrice) {
@@ -233,7 +233,7 @@ contract ClaimSpecificVault is Script {
                     console.log("Error checking conditions");
                 }
 
-            } else if (vault.status == FUMVault.VaultStatus.WITHDRAWN) {
+            } else if (vault.status == CipherVault.VaultStatus.WITHDRAWN) {
                 console.log("Vault already withdrawn");
             } else {
                 console.log("Vault status:", getStatusString(vault.status), "- cannot withdraw");
@@ -246,11 +246,11 @@ contract ClaimSpecificVault is Script {
         vm.stopBroadcast();
     }
 
-    function getStatusString(FUMVault.VaultStatus status) internal pure returns (string memory) {
-        if (status == FUMVault.VaultStatus.ACTIVE) return "ACTIVE";
-        if (status == FUMVault.VaultStatus.UNLOCKED) return "UNLOCKED";
-        if (status == FUMVault.VaultStatus.WITHDRAWN) return "WITHDRAWN";
-        if (status == FUMVault.VaultStatus.EMERGENCY) return "EMERGENCY";
+    function getStatusString(CipherVault.VaultStatus status) internal pure returns (string memory) {
+        if (status == CipherVault.VaultStatus.ACTIVE) return "ACTIVE";
+        if (status == CipherVault.VaultStatus.UNLOCKED) return "UNLOCKED";
+        if (status == CipherVault.VaultStatus.WITHDRAWN) return "WITHDRAWN";
+        if (status == CipherVault.VaultStatus.EMERGENCY) return "EMERGENCY";
         return "UNKNOWN";
     }
 
