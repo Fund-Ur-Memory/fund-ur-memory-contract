@@ -70,7 +70,7 @@ interface IERC5564StealthAddress {
     ) external view returns (bytes memory);
 }
 
-/// @title F.U.M Vault - Fund Ur Memory/Money with Privacy-First Design
+/// @title Cipher Vault - Fund Ur Memory/Money with Privacy-First Design
 /// @notice DeFi protocol for automated asset management with EIP-5564 stealth addresses and immediate emergency access
 /// @dev Complete production-ready contract with EIP-5564 compliant stealth addresses and single penalty pool
 contract FUMVault is ReentrancyGuard, Pausable, Ownable, AutomationCompatibleInterface, IERC5564Announcer, IERC5564StealthAddress {
@@ -207,7 +207,7 @@ contract FUMVault is ReentrancyGuard, Pausable, Ownable, AutomationCompatibleInt
     //                        CONSTRUCTOR
     // =============================================================
 
-    /// @notice Initialize the F.U.M Vault contract
+    /// @notice Initialize the Cipher Vault contract
     /// @param _owner Initial owner of the contract
     constructor(address _owner) Ownable(_owner) {
         nextVaultId = 1;

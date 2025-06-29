@@ -5,14 +5,14 @@ import "forge-std/Script.sol";
 import "forge-std/console.sol";
 import "../src/FUMVault.sol";
 
-/// @title Test Complete F.U.M Flow on Avalanche Fuji
+/// @title Test Complete Cipher Flow on Avalanche Fuji
 contract TestCompleteFuji is Script {
     
     function run() external {
         address fumVaultAddress = vm.envAddress("FUM_VAULT_ADDRESS");
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
         
-        console.log("=== Testing Complete F.U.M Flow on Avalanche Fuji ===");
+        console.log("=== Testing Complete Cipher Flow on Avalanche Fuji ===");
         console.log("FUMVault Address:", fumVaultAddress);
         console.log("Chain ID:", block.chainid);
         
@@ -204,7 +204,7 @@ contract SetupAutomation is Script {
         address fumVaultAddress = vm.envAddress("FUM_VAULT_ADDRESS");
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
         
-        console.log("=== Setting up F.U.M for Automation ===");
+        console.log("=== Setting up Cipher for Automation ===");
         console.log("FUMVault Address:", fumVaultAddress);
         
         vm.startBroadcast(deployerPrivateKey);
@@ -239,7 +239,7 @@ contract MonitorAutomation is Script {
     function run() external view {
         address fumVaultAddress = vm.envAddress("FUM_VAULT_ADDRESS");
         
-        console.log("=== Monitoring F.U.M Automation ===");
+        console.log("=== Monitoring Cipher Automation ===");
         console.log("FUMVault Address:", fumVaultAddress);
         console.log("Current time:", block.timestamp);
         

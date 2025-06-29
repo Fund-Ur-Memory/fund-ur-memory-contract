@@ -596,4 +596,4 @@ async function testVaultCreation(contract: ethers.Contract) {
    - [ ] Test emergency withdrawal flow
    - [ ] Validate event listening
 
-This comprehensive guide provides everything needed to integrate F.U.M into your frontend application. For additional support, refer to the contract source code and test files.
+This comprehensive guide provides everything needed to integrate Cipher into your frontend application. For additional support, refer to the contract source code and test files.

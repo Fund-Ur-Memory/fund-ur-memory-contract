@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
-/// @title F.U.M Vault with Real Stealth Addresses
+/// @title Cipher Vault with Real Stealth Addresses
 /// @notice DeFi protocol with true stealth address privacy - no fake ZK, just real privacy
 /// @dev Implements EIP-5564 style stealth addresses for complete address unlinkability
 contract FUMVaultStealth is ReentrancyGuard, Pausable, Ownable {
@@ -142,7 +142,7 @@ contract FUMVaultStealth is ReentrancyGuard, Pausable, Ownable {
     //                        CONSTRUCTOR
     // =============================================================
 
-    /// @notice Initialize the F.U.M Vault contract with stealth addresses
+    /// @notice Initialize the Cipher Vault contract with stealth addresses
     constructor() Ownable(msg.sender) {
         nextVaultId = 1;
 
